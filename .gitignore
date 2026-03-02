@@ -1,0 +1,6 @@
+.terraform/
+.venv/
+.env
+spark_script.ipynb
+terraform.tfstate
+terraform.tfstate.backup
