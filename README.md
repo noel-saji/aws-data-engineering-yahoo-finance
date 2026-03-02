@@ -101,3 +101,84 @@ To delete all provisioned AWS resources and prevent unnecessary costs:
 ```bash
 terraform destroy
 ```
+
+## 🏗️ Architecture
+
+This project implements an automated, event-driven financial data pipeline on AWS.  
+The workflow follows a fully managed and scalable architecture:
+
+**Docker(Python files=Raw and Transformed) → Amazon ECR → AWS Batch → Amazon EventBridge → AWS Glue Crawler → Amazon Athena**
+
+
+
+<p align="center">
+  <img src="Yahoo_finance_Architecture.png" width="850">
+</p>
+
+---
+
+### 🔹 1. Docker (Containerized Application)
+
+The financial data ingestion and processing logic is packaged into a Docker container.
+
+- Encapsulates dependencies and runtime environment
+- Ensures consistent execution across environments
+- Produces processed output files for storage in Amazon S3
+
+---
+
+### 🔹 2. Amazon ECR (Elastic Container Registry)
+
+The Docker image is pushed to **Amazon ECR**, which acts as a secure container registry.
+
+- Stores versioned container images
+- Enables seamless integration with AWS Batch
+- Provides secure image access via IAM roles
+
+---
+
+### 🔹 3. AWS Batch (Compute Orchestration)
+
+AWS Batch runs the containerized workload at scale.
+
+- Pulls the Docker image from ECR
+- Executes ingestion and transformation jobs
+- Writes processed datasets to Amazon S3
+- Automatically provisions compute resources as needed
+
+---
+
+### 🔹 4. Amazon EventBridge (Event Triggering)
+
+Amazon EventBridge enables event-driven orchestration.
+
+- Triggers AWS Batch jobs on a schedule or rule
+- Automates pipeline execution without manual intervention
+- Enables time-based or event-based processing
+
+---
+
+### 🔹 5. AWS Glue Crawler (Metadata Discovery)
+
+After data is written to Amazon S3, a Glue Crawler:
+
+- Scans the processed data
+- Infers schema automatically
+- Updates the AWS Glue Data Catalog
+- Makes datasets query-ready
+
+---
+
+### 🔹 6. Amazon Athena (Serverless Query Layer)
+
+Amazon Athena enables analytics directly on S3 data.
+
+- Queries data using SQL
+- Reads schema from Glue Data Catalog
+- Enables ad-hoc analysis and reporting
+- No infrastructure management required
+
+---
+
+## 🔁 End-to-End Flow
+
