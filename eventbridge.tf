@@ -33,3 +33,49 @@ resource "aws_scheduler_schedule" "yahoo_schedule" {
     }
   }
 }
+
+
+# 3. The Rule: Filtered specifically to AWS Batch Job Definition
+resource "aws_cloudwatch_event_rule" "batch_job_rule" {
+  name        = "yahoo-terraform-event-rule"
+  description = "Alerts only for the yahoo_terraform_job_definition"
+
+  event_pattern = jsonencode({
+    "source": ["aws.batch"],
+    "detail-type": ["Batch Job State Change"],
+    "detail": {
+      # This ensures the rule ONLY applies to this specific job
+      "jobDefinition": [aws_batch_job_definition.python_app_job.arn],
+      "status": ["FAILED", "SUCCEEDED"]
+    }
+  })
+}
+
+# 4. The Target: SNS Topic
+# The Target: Now with the Input Transformer
+resource "aws_cloudwatch_event_target" "sns_target" {
+  rule      = aws_cloudwatch_event_rule.batch_job_rule.name
+  target_id = "SendToSNS"
+  arn       = aws_sns_topic.batch_job_updates.arn
+
+  input_transformer {
+    # a. Map the JSON fields from the Batch event to variables
+    input_paths = {
+      jobDefinition = "$.detail.jobDefinition"
+      jobName       = "$.detail.jobName"
+      jobQueue      = "$.detail.jobQueue"
+      status        = "$.detail.status"
+    }
+
+    # b. Define the Template using those variables
+    # Note: <status> at the beginning acts as the "Subject line" in SNS emails
+    input_template = <<EOF
+"<status>: Job Name = <jobName>"
+"Job Definition = <jobDefinition>"
+"Status = <status>"
+EOF
+  }
+}
+
+
+

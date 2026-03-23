@@ -37,7 +37,7 @@ Create an **S3 Bucket** (e.g., `my-data-engineering-project`) and manually creat
 *   `transformed/`
   
 > [!IMPORTANT]
-> **Change Bucket name inside raw_script and transforned scripts(Python)**
+> **Enter the bucket name inside tfvars Terraform file or change Bucket name inside raw_script and transforned scripts(Python)**
 > After creating S3 bucket Name, Copy this Bucket name and paste it inside raw and transformed script files on Bucket names initialised
 ---
 
