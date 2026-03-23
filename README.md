@@ -29,8 +29,6 @@ Before setting up the project, ensure you have the following installed and confi
 
 ### Secrets Management
 Navigate to [AWS Secrets Manager](https://aws.amazon.com) and create a secret containing the following keys:
-*   `AWS_Access_key`
-*   `AWS_Secrets`
 *   `Yahoo_API`
 
 ### Storage Layer

@@ -5,8 +5,8 @@ FROM python:3.8-slim
 RUN pip install boto3 requests
 
 # Copy both scripts (ingestion and transformation)
-COPY raw_script.py /app/raw_script.py
-COPY transform_script.py /app/transform_script.py
+COPY src/raw_script.py /app/raw_script.py
+COPY src/transform_script.py /app/transform_script.py
 
 # Set the working directory
 WORKDIR /app

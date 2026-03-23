@@ -1,24 +1,13 @@
-# Find the secret by its name
-data "aws_secretsmanager_secret" "yh_finance" {
-  name = "YH_Finance_Api"
-}
-
-# Fetch the current version of the secret
 data "aws_secretsmanager_secret_version" "yh_finance_latest" {
-  secret_id = data.aws_secretsmanager_secret.yh_finance.id
+  secret_id = "YH_Finance_Api" # Simplified per our earlier discussion
 }
 
-# Decode the JSON string into a local map for use
 locals {
   finance_secrets = jsondecode(data.aws_secretsmanager_secret_version.yh_finance_latest.secret_string)
 }
 
-# This finds your Default VPC
-data "aws_vpc" "default" {
-  default = true
-}
+data "aws_vpc" "default" { default = true }
 
-# This finds the subnets within that Default VPC
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"
@@ -26,25 +15,26 @@ data "aws_subnets" "default" {
   }
 }
 
-# This finds the "default" security group in that VPC
 data "aws_security_group" "default" {
   name   = "default"
   vpc_id = data.aws_vpc.default.id
 }
 
+# --- [UPDATED SECTION] ---
 
-# 1. Fetch the existing Role from AWS Console
-data "aws_iam_role" "existing_batch_role" {
-  name = "BatchEcsTaskExecutionRole"
-}
+# 1. Reference the new role we created earlier
+# (Make sure the 'aws_iam_role' resource block from the previous step is in your files)
 
-# 2. Batch Compute Environment (Using the existing role)
+# 2. Batch Compute Environment
 resource "aws_batch_compute_environment" "fargate_env" {
-  name = "yahoo_terraform"
-  type                     = "MANAGED"
-  state                    = "ENABLED"
-  # Reference the ARN from the data source
-  service_role             = data.aws_iam_role.existing_batch_role.arn
+  name     = "yahoo_terraform"
+  type     = "MANAGED"
+  state    = "ENABLED"
+  
+  # UPDATED: Added the policy attachment to the existing depends_on list
+  depends_on = [aws_iam_role_policy_attachment.managed_attachments]
+  # UPDATED: Points to the new Terraform-managed role
+  service_role = aws_iam_role.batch_ecs_task_role.arn
 
   compute_resources {
     type                = "FARGATE"
@@ -56,9 +46,9 @@ resource "aws_batch_compute_environment" "fargate_env" {
 
 # 3. Job Queue
 resource "aws_batch_job_queue" "fargate_queue" {
-  name                 = "yahoo_terraform_job_queue"
-  state                = "ENABLED"
-  priority             = 1
+  name     = "yahoo_terraform_job_queue"
+  state    = "ENABLED"
+  priority = 1
 
   compute_environment_order {
     order               = 1
@@ -73,8 +63,11 @@ resource "aws_batch_job_definition" "python_app_job" {
 
   platform_capabilities = ["FARGATE"]
   
-  # Ensure the docker push happens before the job definition is created
-  depends_on = [null_resource.docker_push]
+  # UPDATED: Added the policy attachment to the existing depends_on list
+  depends_on = [
+    null_resource.docker_push,
+    aws_iam_role_policy_attachment.managed_attachments
+  ]
 
   container_properties = jsonencode({
     image = "${aws_ecr_repository.python_app.repository_url}:latest"
@@ -82,17 +75,20 @@ resource "aws_batch_job_definition" "python_app_job" {
       { type = "VCPU", value = "2" },
       { type = "MEMORY", value = "4096" }
     ]
-    # Reference the same existing role ARN
-    executionRoleArn = data.aws_iam_role.existing_batch_role.arn
+    
+    executionRoleArn = aws_iam_role.batch_ecs_task_role.arn
+    jobRoleArn       = aws_iam_role.batch_ecs_task_role.arn
 
     networkConfiguration = {
       assignPublicIp = "ENABLED"
     }
 
     environment = [
-      { name  = "AWS_ACCESS_KEY_ID", value = local.finance_secrets["AWS_ACCESS_KEY"]},
-      { name  = "AWS_SECRET_ACCESS_KEY", value = local.finance_secrets["AWS_SECRET_ACCESS_KEY"]}
+#      { name  = "AWS_ACCESS_KEY_ID", value = local.finance_secrets["AWS_ACCESS_KEY"]},
+#      { name  = "AWS_SECRET_ACCESS_KEY", value = local.finance_secrets["AWS_SECRET_ACCESS_KEY"]},
+      { name  = "S3_BUCKET", value = var.bucket_name }
     ]
+    
     fargatePlatformConfiguration = { platformVersion = "LATEST" }
     runtimePlatform = {
       operatingSystemFamily = "LINUX"

@@ -16,20 +16,22 @@ data "aws_ecr_authorization_token" "token" {}
 
 resource "null_resource" "docker_push" {
   triggers = {
+    dir_hash = sha256(join("", [for f in fileset(path.module, "src/*") : filebase64sha256(f)]))
     dockerfile_hash = filebase64sha256("${path.module}/Dockerfile")
-    token_expiry    = data.aws_ecr_authorization_token.token.expires_at
+#    token_expiry    = data.aws_ecr_authorization_token.token.expires_at
   }
 
   provisioner "local-exec" {
     interpreter = ["PowerShell", "-Command"]
     command = <<-EOT
-        aws ecr get-login-password --region ${data.aws_ecr_authorization_token.token.region} | docker login --username AWS --password-stdin ${aws_ecr_repository.python_app.repository_url}
+        $token = aws ecr get-login-password --region ${var.aws_region}
+        docker login --   username AWS --password $token ${aws_ecr_repository.python_app.repository_url}
       
         docker build -t ${aws_ecr_repository.python_app.repository_url}:latest .
-      
         docker push ${aws_ecr_repository.python_app.repository_url}:latest
     EOT
   }
+
 
   depends_on = [aws_ecr_repository.python_app]
 }

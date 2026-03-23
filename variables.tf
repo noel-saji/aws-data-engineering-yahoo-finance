@@ -9,3 +9,9 @@ variable "repo_name" {
   type        = string
   default     = "my-python-app"
 }
+
+variable "bucket_name" {
+  description = "Name of the S3 Bucket"
+  type        = string
+  default     = "bucket-name"
+}
