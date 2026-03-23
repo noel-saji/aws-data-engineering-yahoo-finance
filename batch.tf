@@ -84,8 +84,6 @@ resource "aws_batch_job_definition" "python_app_job" {
     }
 
     environment = [
-#      { name  = "AWS_ACCESS_KEY_ID", value = local.finance_secrets["AWS_ACCESS_KEY"]},
-#      { name  = "AWS_SECRET_ACCESS_KEY", value = local.finance_secrets["AWS_SECRET_ACCESS_KEY"]},
       { name  = "S3_BUCKET", value = var.bucket_name }
     ]
     
