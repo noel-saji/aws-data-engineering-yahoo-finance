@@ -39,6 +39,16 @@ Before setting up the project, ensure you have the following installed and confi
 > **Manual AWS Setup Tasks**
 > The following steps must be completed in the [AWS Management Console](https://console.aws.amazon.com) before running the automation scripts.
 
+### Environment Setup
+Create a `terraform.tfvars` file in the root directory and add the following:
+
+```makefile
+aws_region = "ap-south-1"
+repo_name  = "your-repo-name"
+bucket_name = "your-bucket-name"
+email_name = "your.email@gmail.com"
+```
+
 ### IAM Configuration
 1.  **Create IAM User**: From your **Root Account**, create a new IAM user.
 2.  **Permissions**: Attach the `AdministratorAccess` policy to this user.
