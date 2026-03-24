@@ -180,3 +180,16 @@ Amazon Athena enables analytics directly on S3 data.
 
 ## 🔁 End-to-End Flow
 
+### Environment Setup
+Create a `terraform.tfvars` file in the root directory and add the following:
+
+```makefile
+# Terraform Varibales Configuration
+# CHANGE THESE VALUES AS NEEDED
+aws_region = "ap-south-1"
+repo_name  = "repo-name"
+bucket_name = "bucket-name"
+email_name = "your.email@gmail.com"
+
+```
+

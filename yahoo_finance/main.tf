@@ -25,12 +25,30 @@ resource "null_resource" "docker_push" {
     interpreter = ["PowerShell", "-Command"]
     command = <<-EOT
         $token = aws ecr get-login-password --region ${var.aws_region}
-        docker login --   username AWS --password $token ${aws_ecr_repository.python_app.repository_url}
+        docker login --username AWS --password $token ${aws_ecr_repository.python_app.repository_url}
       
         docker build -t ${aws_ecr_repository.python_app.repository_url}:latest .
         docker push ${aws_ecr_repository.python_app.repository_url}:latest
     EOT
   }
+
+  #   provisioner "local-exec" {
+  #   # Switch interpreter to Command Prompt
+  #   interpreter = ["cmd", "/C"]
+    
+  #   command = <<-EOT
+  #       @echo off
+  #       :: Step 1: Login to ECR using a one-liner to avoid variable issues in CMD
+  #       aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repository.python_app.repository_url}
+        
+  #       :: Step 2: Build the image
+  #       docker build -t ${aws_ecr_repository.python_app.repository_url}:latest .
+        
+  #       :: Step 3: Push the image
+  #       docker push ${aws_ecr_repository.python_app.repository_url}:latest
+  #   EOT
+  # }
+
 
 
   depends_on = [aws_ecr_repository.python_app]

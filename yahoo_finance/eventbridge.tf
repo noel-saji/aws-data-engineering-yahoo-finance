@@ -13,7 +13,7 @@ resource "aws_scheduler_schedule" "yahoo_schedule" {
   }
 
   # Updated to run every 10 minutes
-  schedule_expression = "rate(10 minutes)"
+  schedule_expression = "rate(1 hour)"
 
   # Optional but recommended to ensure permissions are ready
   depends_on = [aws_iam_role_policy.scheduler_batch_policy] 
@@ -46,7 +46,7 @@ resource "aws_cloudwatch_event_rule" "batch_job_rule" {
     "detail": {
       # This ensures the rule ONLY applies to this specific job
       "jobDefinition": [aws_batch_job_definition.python_app_job.arn],
-      "status": ["FAILED", "SUCCEEDED"]
+      "status": ["FAILED"]
     }
   })
 }
