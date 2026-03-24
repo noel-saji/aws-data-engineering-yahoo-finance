@@ -1,13 +1,6 @@
 # 🚀 Enterprise Data Pipeline: Yahoo Finance to Athena
 > **Architecture:** Automated ETL Pipeline using Containerized Python, AWS Batch, and Glue Data Cataloging.
 
-<img src="images/aws_logo.png" width="40" alt="AWS"> &nbsp; 
-<img src="images/docker_logo.jpg" width="55" height="40" alt="Docker"> &nbsp; 
-<img src="images/python_logo.png" width="40" alt="Python"> &nbsp; 
-<img src="images/terraform_logo.png" width="70" height="40" alt="Terraform">
-
-
-
 ---
 
 ## 🏗️ Technical Architecture Breakdown
