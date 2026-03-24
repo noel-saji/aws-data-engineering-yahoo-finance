@@ -1,7 +1,22 @@
-# Financial Data Engineering Pipeline
+# Data Engineering for Financial Stock Market Pipeline 🛠️📊 
 
-## Project Description
-This project implements a scalable **end-to-end data pipeline** that automates the extraction of financial market data using the **Yahoo Finance API**. The architecture follows a modern data lake pattern where raw data is ingested into **AWS S3**, processed, and stored in a transformed layer. Infrastructure is managed as code using **Terraform**, while **Docker** ensures a consistent environment for the data ingestion logic.
+<img src="images/aws_logo.png" width="40" alt="AWS"> &nbsp; 
+<img src="images/docker_logo.png" width="50" height="40" alt="Docker"> &nbsp; 
+<img src="images/python_logo.png" width="40" alt="Python"> &nbsp; 
+<img src="images/terraform_logo.png" width="50" height="40" alt="Terraform">
+
+### Project Overview: Serverless ELT Pipeline for Yahoo Finance
+
+This project implements a **serverless, event-driven ELT pipeline** designed for the automated, hourly ingestion and transformation of **Yahoo Finance** stock data. The system captures raw market metrics—including OHLC prices and trading volumes—and processes them through a transformation layer that converts raw values into currency-normalized prices, adjusted closing rates, and hourly percentage changes.
+
+### Technical Implementation
+
+*   ✅ **Data Logic & Containerization**: Core ingestion and transformation are handled by **Python** scripts. These are packaged into **Docker** images and stored in **Amazon ECR** to ensure environment consistency.
+*   ✅ **Orchestration & Compute**: **AWS Batch** manages the lifecycle of the containerized jobs, dynamically provisioning compute resources only when needed. These jobs are triggered hourly using **Amazon EventBridge**.
+*   ✅ **Infrastructure as Code (IaC)**: The entire cloud environment—including networking, compute, and security—is provisioned and managed using **Terraform**, providing a repeatable and version-controlled deployment.
+*   ✅ **Monitoring & Alerting**: Reliability is maintained through **Amazon SNS**, which sends automated email notifications to administrators in the event of a pipeline or job failure.
+*   ✅ **Data Lake & Analytics**: Transformed data is registered in the **AWS Glue Data Catalog**. Users can perform high-performance SQL analysis on historical market trends via **Amazon Athena**, leveraging optimized **S3 data partitioning**.
+
 
 ---
 
@@ -100,96 +115,4 @@ To delete all provisioned AWS resources and prevent unnecessary costs:
 terraform destroy
 ```
 
-## 🏗️ Architecture
-
-This project implements an automated, event-driven financial data pipeline on AWS.  
-The workflow follows a fully managed and scalable architecture:
-
-**Docker(Python files=Raw and Transformed) → Amazon ECR → AWS Batch → Amazon EventBridge → AWS Glue Crawler → Amazon Athena**
-
-
-
-<p align="center">
-  <img src="Yahoo_finance_Architecture.png" width="850">
-</p>
-
----
-
-### 🔹 1. Docker (Containerized Application)
-
-The financial data ingestion and processing logic is packaged into a Docker container.
-
-- Encapsulates dependencies and runtime environment
-- Ensures consistent execution across environments
-- Produces processed output files for storage in Amazon S3
-
----
-
-### 🔹 2. Amazon ECR (Elastic Container Registry)
-
-The Docker image is pushed to **Amazon ECR**, which acts as a secure container registry.
-
-- Stores versioned container images
-- Enables seamless integration with AWS Batch
-- Provides secure image access via IAM roles
-
----
-
-### 🔹 3. AWS Batch (Compute Orchestration)
-
-AWS Batch runs the containerized workload at scale.
-
-- Pulls the Docker image from ECR
-- Executes ingestion and transformation jobs
-- Writes processed datasets to Amazon S3
-- Automatically provisions compute resources as needed
-
----
-
-### 🔹 4. Amazon EventBridge (Event Triggering)
-
-Amazon EventBridge enables event-driven orchestration.
-
-- Triggers AWS Batch jobs on a schedule or rule
-- Automates pipeline execution without manual intervention
-- Enables time-based or event-based processing
-
----
-
-### 🔹 5. AWS Glue Crawler (Metadata Discovery)
-
-After data is written to Amazon S3, a Glue Crawler:
-
-- Scans the processed data
-- Infers schema automatically
-- Updates the AWS Glue Data Catalog
-- Makes datasets query-ready
-
----
-
-### 🔹 6. Amazon Athena (Serverless Query Layer)
-
-Amazon Athena enables analytics directly on S3 data.
-
-- Queries data using SQL
-- Reads schema from Glue Data Catalog
-- Enables ad-hoc analysis and reporting
-- No infrastructure management required
-
----
-
-## 🔁 End-to-End Flow
-
-### Environment Setup
-Create a `terraform.tfvars` file in the root directory and add the following:
-
-```makefile
-# Terraform Varibales Configuration
-# CHANGE THESE VALUES AS NEEDED
-aws_region = "ap-south-1"
-repo_name  = "repo-name"
-bucket_name = "bucket-name"
-email_name = "your.email@gmail.com"
-
-```
 
