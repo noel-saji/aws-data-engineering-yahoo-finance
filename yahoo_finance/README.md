@@ -1,9 +1,11 @@
-# Data Engineering for Financial Stock Market Pipeline 🛠️📊 
+# Data Engineering for Financial Stock Market Pipeline 🛠️📊
 
-<img src="images/aws_logo.png" width="40" alt="AWS"> &nbsp; 
-<img src="images/docker_logo.png" width="50" height="40" alt="Docker"> &nbsp; 
-<img src="images/python_logo.png" width="40" alt="Python"> &nbsp; 
-<img src="images/terraform_logo.png" width="50" height="40" alt="Terraform">
+
+| | | | |
+| :---: | :---: | :---: | :---: |
+| <img src="images/aws_logo.png" width="40"> | <img src="images/docker_logo.png" width="40"> | <img src="images/python_logo.png" width="40"> | <img src="images/terraform_logo.png" width="40"> |
+| **AWS** | **Docker** | **Python** | **Terraform** |
+
 
 ### Project Overview: Serverless ELT Pipeline for Yahoo Finance
 
