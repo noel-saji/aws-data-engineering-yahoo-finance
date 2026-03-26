@@ -18,7 +18,6 @@ resource "null_resource" "docker_push" {
   triggers = {
     dir_hash = sha256(join("", [for f in fileset(path.module, "src/*") : filebase64sha256(f)]))
     dockerfile_hash = filebase64sha256("${path.module}/Dockerfile")
-#    token_expiry    = data.aws_ecr_authorization_token.token.expires_at
   }
 
   provisioner "local-exec" {
@@ -31,26 +30,6 @@ resource "null_resource" "docker_push" {
         docker push ${aws_ecr_repository.python_app.repository_url}:latest
     EOT
   }
-
-  #   provisioner "local-exec" {
-  #   # Switch interpreter to Command Prompt
-  #   interpreter = ["cmd", "/C"]
-    
-  #   command = <<-EOT
-  #       @echo off
-  #       :: Step 1: Login to ECR using a one-liner to avoid variable issues in CMD
-  #       aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repository.python_app.repository_url}
-        
-  #       :: Step 2: Build the image
-  #       docker build -t ${aws_ecr_repository.python_app.repository_url}:latest .
-        
-  #       :: Step 3: Push the image
-  #       docker push ${aws_ecr_repository.python_app.repository_url}:latest
-  #   EOT
-  # }
-
-
-
   depends_on = [aws_ecr_repository.python_app]
 }
 
