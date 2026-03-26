@@ -19,6 +19,13 @@ resource "aws_iam_role" "batch_ecs_task_role" {
         Principal = {
           Service = "batch.amazonaws.com"
         }
+      },
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "glue.amazonaws.com"
+        }
       }
     ]
   })
@@ -31,7 +38,8 @@ locals {
     "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
     "arn:aws:iam::aws:policy/AWSBatchFullAccess",
-    "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+    "arn:aws:iam::aws:policy/SecretsManagerReadWrite",
+    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
   ]
 }
 

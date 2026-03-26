@@ -59,13 +59,14 @@ def write_to_s3(bucket_name, data, key_prefix):
     
     # Get current time for folder structure
     now = datetime.now()
+    year = now.strftime("%Y")
     month = now.strftime("%m") # e.g., '03'
     day = now.strftime("%d")   # e.g., '20'
     full_timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
     
     # Construct the dynamic key
     # Result: transformed/03/20/transformed_stock_data_2026-03-20_13-40-00.json
-    key = f"{key_prefix}/{month}/{day}/transformed_stock_data_{full_timestamp}.json"
+    key = f"{key_prefix}/{year}/{month}/{day}/transformed_stock_data_{full_timestamp}.json"
     
     s3.put_object(
         Bucket=bucket_name, 

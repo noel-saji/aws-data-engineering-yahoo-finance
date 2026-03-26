@@ -12,7 +12,7 @@ resource "aws_scheduler_schedule" "yahoo_schedule" {
     mode = "OFF"
   }
 
-  # Updated to run every 10 minutes
+  # Updated to run every 1 hour
   schedule_expression = "rate(1 hour)"
 
   # Optional but recommended to ensure permissions are ready
