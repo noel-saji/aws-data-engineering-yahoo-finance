@@ -1,4 +1,4 @@
-# Data Engineering for Financial Stock Market Pipeline 🛠️📊
+# Data Engineering/Data OPs for Financial Stock Market Pipeline 🛠️📊
 
 
 | | | | |
