@@ -2,7 +2,7 @@
 
 
 | | | | |
-| :---: | :---: | :---: | :---: |
+| :---: | :--: | :---: | :---: |
 | <img src="images/aws_logo.png" width="40"> | <img src="images/docker_logo.png" width="40"> | <img src="images/python_logo.png" width="40"> | <img src="images/terraform_logo.png" width="40"> |
 | **AWS** | **Docker** | **Python** | **Terraform** |
 
