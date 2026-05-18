@@ -1,59 +1,17 @@
 # KFC Order Streaming — Kafka Pipeline
 
+> **Note:** This is **just a demo Kafka pipeline** for consuming messages
+> from **fake data being produced** — no real KFC systems, customers, or
+> orders are involved. The producer fabricates synthetic UAE order traffic
+> with `faker` purely to exercise the broker/consumer flow.
+
 A small Kafka project that simulates KFC UAE order traffic and streams it
 through a single-node Kafka broker into a "kitchen" consumer, with a
 dead-letter queue for poison messages.
 
 ## Architecture
 
-```text
-  ┌──────────────┐    JSON order    ┌──────────────────┐    poll(1s)    ┌──────────────┐
-  │   Producer   │ ───────────────▶ │      Kafka       │ ─────────────▶ │   Consumer   │
-  │   main.py    │                  │   kfc-orders     │                │ kfcconsumer  │
-  └──────────────┘                  │   kfc-orders.dlq │ ◀── on error ──┤              │
-                                    └──────────────────┘                └──────────────┘
-```
-
-**Flow:** `main.py` generates orders via `kfcproducer.py`, publishes them to
-`kfc-orders` keyed by branch. The consumer (`group.id=kfc-kitchen`) reads
-each order, logs it as a kitchen ticket, and forwards any unparseable
-message to `kfc-orders.dlq` before committing the offset.
-
-### Components
-
-| File | Role |
-|------|------|
-| `docker-compose.yaml` | Single-node Kafka broker in KRaft mode (no ZooKeeper), exposed on `localhost:9092`. |
-| `kfcproducer.py` | Order-generation library. Builds realistic UAE KFC orders (branches, menu items, add-ons, deals, AED prices) via `faker`. |
-| `main.py` | Kafka producer. Calls `generate_order()` in a loop and publishes JSON to the `kfc-orders` topic. |
-| `kfcconsumer.py` | Kafka consumer ("kitchen"). Reads orders, logs them, and forwards unparseable messages to the DLQ. |
-
-### Message flow
-
-1. `main.py` calls `generate_order()` to build an order dict — branch, order
-   type (Deliveroo / Dine In / etc.), customer, phone, items with add-ons,
-   optional "top deal", and a computed AED total.
-2. The order is serialized to JSON and produced to **`kfc-orders`** keyed by
-   **branch name**, so all orders for a given branch land on the same
-   partition (preserves per-branch ordering).
-3. The consumer (`group.id=kfc-kitchen`) polls `kfc-orders`, decodes each
-   message, and logs a formatted ticket.
-4. If a message fails to parse, it is forwarded to **`kfc-orders.dlq`** with
-   headers (`error`, `source_topic`, `source_partition`, `source_offset`)
-   before the offset is committed.
-
-### Reliability characteristics
-
-- **Producer**: `acks=all`, `enable.idempotence=true`, large retry budget,
-  `lz4` compression, `linger.ms=20`. Exactly-once-effective publishing per
-  partition, with at-least-once delivery semantics end-to-end.
-- **Consumer**: `enable.auto.commit=false`, manual synchronous commit after
-  each message — at-least-once processing with explicit DLQ routing for
-  poison pills.
-- **Graceful shutdown**: both sides handle `SIGINT`/`SIGTERM`, flush
-  in-flight messages, and close cleanly.
-- **Throughput logging**: producer and consumer log msg/sec every 10
-  messages.
+![KFC Order Streaming Pipeline](kfc_order_stream_architecture.jpg)
 
 ## Running locally
 
