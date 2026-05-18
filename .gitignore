@@ -5,4 +5,4 @@ spark_script.ipynb
 *.tfstate
 *.tfstate.backup
 *.tfvars
-**/_pycache_/
+**/__pycache__/
